@@ -1,11 +1,9 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-
-using Portugol.Builder.Interpreter;
+﻿using Portugol.Builder.Interpreter;
 using Portugol.Builder.Lexer;
 using Portugol.Builder.Parser;
+using Portugol.Builder.Parser.Nodes;
 
-var program = @"
+string program = @"
 num i = 2;
 enquanto i < 5 {
     escreve(i);
@@ -36,10 +34,10 @@ enquanto verdadeiro {
 }
 ";
 
-var lexer = new LexerToken(program);
-var parser = new Parser(lexer);
-var tree = parser.Parse();
-var interpreter = new Interpreter(tree);
+LexerToken lexer = new(program);
+Parser parser = new(lexer);
+Node tree = parser.Parse();
+Interpreter interpreter = new(tree);
 interpreter.Interpret();
 
 Console.WriteLine("Fim");

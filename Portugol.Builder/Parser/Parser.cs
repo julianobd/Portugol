@@ -14,45 +14,33 @@ namespace Portugol.Builder.Parser
             _currentToken = _lexer.GetNextToken();
         }
 
-        private void Eat(List<TokenType> tokenType)
-        {
-            if (tokenType.Contains(_currentToken.Type))
-                _currentToken = _lexer.GetNextToken();
-            else
-                throw new Exception($"Unexpected token: {_currentToken}");
-        }
+        private void Eat(List<TokenType> tokenType) => _currentToken = tokenType.Contains(_currentToken.Type) ? _lexer.GetNextToken() : throw new Exception($"Unexpected token: {_currentToken}");
 
-        private void Eat(TokenType tokenType)
-        {
-            if (_currentToken.Type == tokenType)
-                _currentToken = _lexer.GetNextToken();
-            else
-                throw new Exception($"Unexpected token: {_currentToken}");
-        }
+        private void Eat(TokenType tokenType) => _currentToken = _currentToken.Type == tokenType ? _lexer.GetNextToken() : throw new Exception($"Unexpected token: {_currentToken}");
 
         private Node Factor()
         {
-            var token = _currentToken;
+            Token token = _currentToken;
             if (token.Type == TokenType.Number)
             {
                 Eat(TokenType.Number);
                 return new NumberNode(token);
             }
-            else if (token.Type == TokenType.BoolTrue || token.Type == TokenType.BoolFalse)
+            else if (token.Type is TokenType.BoolTrue or TokenType.BoolFalse)
             {
                 Eat(token.Type);
                 return new BoolNode(token);
             }
             else if (token.Type == TokenType.Identifier)
             {
-                var variable = new VariableNode(token);
+                VariableNode variable = new(token);
                 Eat(TokenType.Identifier);
                 return variable;
             }
             else if (token.Type == TokenType.LeftParen)
             {
                 Eat(TokenType.LeftParen);
-                var node = Expr();
+                Node node = Expr();
                 Eat(TokenType.RightParen);
                 return node;
             }
@@ -76,11 +64,11 @@ namespace Portugol.Builder.Parser
 
         private Node Term()
         {
-            var node = Factor();
+            Node node = Factor();
 
-            while (_currentToken.Type == TokenType.Multiply || _currentToken.Type == TokenType.Divide || _currentToken.Type == TokenType.Modulus)
+            while (_currentToken.Type is TokenType.Multiply or TokenType.Divide or TokenType.Modulus)
             {
-                var token = _currentToken;
+                Token token = _currentToken;
                 if (token.Type == TokenType.Multiply)
                 {
                     Eat(TokenType.Multiply);
@@ -100,10 +88,10 @@ namespace Portugol.Builder.Parser
 
         private Node Expr()
         {
-            var node = Term();
-            while (_currentToken.Type == TokenType.Plus || _currentToken.Type == TokenType.Minus)
+            Node node = Term();
+            while (_currentToken.Type is TokenType.Plus or TokenType.Minus)
             {
-                var token = _currentToken;
+                Token token = _currentToken;
                 if (token.Type == TokenType.Plus)
                 {
                     Eat(TokenType.Plus);
@@ -119,12 +107,12 @@ namespace Portugol.Builder.Parser
 
         private Node Comparison()
         {
-            var node = Expr();
-            while (_currentToken.Type == TokenType.Equal || _currentToken.Type == TokenType.NotEqual ||
-                   _currentToken.Type == TokenType.LessThan || _currentToken.Type == TokenType.GreaterThan ||
-                   _currentToken.Type == TokenType.LessEqual || _currentToken.Type == TokenType.GreaterEqual)
+            Node node = Expr();
+            while (_currentToken.Type is TokenType.Equal or TokenType.NotEqual or
+                   TokenType.LessThan or TokenType.GreaterThan or
+                   TokenType.LessEqual or TokenType.GreaterEqual)
             {
-                var token = _currentToken;
+                Token token = _currentToken;
                 switch (token.Type)
                 {
                     case TokenType.Equal:
@@ -154,12 +142,12 @@ namespace Portugol.Builder.Parser
         private Node IfStatement()
         {
             Eat(TokenType.If);
-            var condition = Comparison();
+            Node condition = Comparison();
             Eat(TokenType.LeftBrace);
-            var thenBranch = Block();
+            BlockNode thenBranch = Block();
             Eat(TokenType.RightBrace);
 
-            Node elseBranch = null;
+            Node? elseBranch = null;
             if (_currentToken.Type == TokenType.Else)
             {
                 Eat(TokenType.Else);
@@ -173,9 +161,9 @@ namespace Portugol.Builder.Parser
         private Node WhileStatement()
         {
             Eat(TokenType.While);
-            var condition = Comparison();
+            Node condition = Comparison();
             Eat(TokenType.LeftBrace);
-            var body = Block();
+            BlockNode body = Block();
             Eat(TokenType.RightBrace);
             return new WhileNode(condition, body);
         }
@@ -184,15 +172,15 @@ namespace Portugol.Builder.Parser
         {
             Eat(TokenType.For);
             Eat(TokenType.LeftParen);
-            var initializer = Statement();
-            var condition = Comparison();
+            Node initializer = Statement();
+            Node condition = Comparison();
             Eat(TokenType.Semicolon);
-            var iterator = Statement();
+            Node iterator = Statement();
             //Eat(new List<TokenType> { TokenType.Semicolon, TokenType.RightParen });
             Eat(TokenType.LeftBrace);
             //Eat(TokenType.RightParen);
             //Eat(TokenType.LeftBrace);
-            var body = Block();
+            BlockNode body = Block();
             Eat(TokenType.RightBrace);
             return new ForNode(initializer, condition, iterator, body);
         }
@@ -202,13 +190,13 @@ namespace Portugol.Builder.Parser
             Eat(TokenType.Foreach);
             Eat(TokenType.LeftParen);
             Eat(TokenType.Num);
-            var variable = new VariableNode(_currentToken);
+            VariableNode variable = new(_currentToken);
             Eat(TokenType.Identifier);
             Eat(TokenType.In);
-            var collection = Expr();
+            Node collection = Expr();
             Eat(TokenType.RightParen);
             Eat(TokenType.LeftBrace);
-            var body = Block();
+            BlockNode body = Block();
             Eat(TokenType.RightBrace);
             return new ForeachNode(variable, collection, body);
         }
@@ -216,7 +204,7 @@ namespace Portugol.Builder.Parser
         private Node Array()
         {
             Eat(TokenType.LeftBracket);
-            var elements = new List<Node>();
+            List<Node> elements = [];
             while (_currentToken.Type != TokenType.RightBracket)
             {
                 elements.Add(Expr());
@@ -247,37 +235,37 @@ namespace Portugol.Builder.Parser
             }
             else if (_currentToken.Type == TokenType.Identifier)
             {
-                var variable = new VariableNode(_currentToken);
+                VariableNode variable = new(_currentToken);
                 Eat(TokenType.Identifier);
 
                 if (_currentToken.Type == TokenType.Assign)
                 {
                     Eat(TokenType.Assign);
-                    var value = Expr();
-                    Eat(new List<TokenType> { TokenType.Semicolon, TokenType.RightParen });
+                    Node value = Expr();
+                    Eat([TokenType.Semicolon, TokenType.RightParen]);
                     return new AssignNode(variable, value);
                 }
             }
-            else if (_currentToken.Type == TokenType.Num || _currentToken.Type == TokenType.Txt || _currentToken.Type == TokenType.Bol)
+            else if (_currentToken.Type is TokenType.Num or TokenType.Txt or TokenType.Bol)
             {
-                var varType = _currentToken.Type;
+                TokenType varType = _currentToken.Type;
                 Eat(varType);
 
                 if (_currentToken.Type == TokenType.LeftBracket)
                 {
                     Eat(TokenType.LeftBracket);
                     Eat(TokenType.RightBracket);
-                    return new ArrayNode(new List<Node>());
+                    return new ArrayNode([]);
                 }
                 else
                 {
-                    var variable = new VariableNode(_currentToken);
+                    VariableNode variable = new(_currentToken);
                     Eat(TokenType.Identifier);
 
                     if (_currentToken.Type == TokenType.Assign)
                     {
                         Eat(TokenType.Assign);
-                        Node value = null;
+                        Node? value = null;
                         if (varType == TokenType.Num)
                         {
                             value = Expr();
@@ -301,7 +289,7 @@ namespace Portugol.Builder.Parser
             {
                 Eat(TokenType.Print);
                 Eat(TokenType.LeftParen);
-                var expression = Expr();
+                Node expression = Expr();
                 Eat(TokenType.RightParen);
                 Eat(TokenType.Semicolon);
                 return new PrintNode(expression);
@@ -310,7 +298,7 @@ namespace Portugol.Builder.Parser
             {
                 Eat(TokenType.ReadLine);
                 Eat(TokenType.LeftParen);
-                var variable = new VariableNode(_currentToken);
+                VariableNode variable = new(_currentToken);
                 Eat(TokenType.Identifier);
                 Eat(TokenType.RightParen);
                 Eat(TokenType.Semicolon);
@@ -321,17 +309,14 @@ namespace Portugol.Builder.Parser
 
         private BlockNode Block()
         {
-            var statements = new List<Node>();
-            while (_currentToken.Type != TokenType.RightBrace && _currentToken.Type != TokenType.EOF)
+            List<Node> statements = [];
+            while (_currentToken.Type is not TokenType.RightBrace and not TokenType.EOF)
             {
                 statements.Add(Statement());
             }
             return new BlockNode(statements);
         }
 
-        public Node Parse()
-        {
-            return Block();
-        }
+        public Node Parse() => Block();
     }
 }

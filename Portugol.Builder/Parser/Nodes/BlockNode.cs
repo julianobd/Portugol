@@ -4,9 +4,6 @@
     {
         public List<Node> Statements { get; }
 
-        public BlockNode(List<Node> statements)
-        {
-            Statements = statements;
-        }
+        public BlockNode(List<Node> statements) => Statements = statements;
     }
 }

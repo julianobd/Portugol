@@ -6,7 +6,7 @@
         public Node ThenBranch { get; }
         public Node ElseBranch { get; }
 
-        public IfNode(Node condition, Node thenBranch, Node elseBranch = null)
+        public IfNode(Node condition, Node thenBranch, Node? elseBranch = null)
         {
             Condition = condition;
             ThenBranch = thenBranch;

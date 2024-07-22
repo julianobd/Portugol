@@ -4,9 +4,6 @@
     {
         public Node Expression { get; }
 
-        public PrintNode(Node expression)
-        {
-            Expression = expression;
-        }
+        public PrintNode(Node expression) => Expression = expression;
     }
 }

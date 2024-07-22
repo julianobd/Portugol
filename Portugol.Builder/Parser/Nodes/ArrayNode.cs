@@ -4,9 +4,6 @@
     {
         public List<Node> Elements { get; }
 
-        public ArrayNode(List<Node> elements)
-        {
-            Elements = elements;
-        }
+        public ArrayNode(List<Node> elements) => Elements = elements;
     }
 }

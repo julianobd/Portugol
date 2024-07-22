@@ -7,9 +7,6 @@ namespace Portugol.Builder.Parser.Nodes
         public Token Token { get; }
         public bool Value => Token.Value == "verdadeiro";
 
-        public BoolNode(Token token)
-        {
-            Token = token;
-        }
+        public BoolNode(Token token) => Token = token;
     }
 }

@@ -4,14 +4,11 @@ namespace Portugol.Builder.Lexer
 {
     public class LexerToken
     {
-        private static readonly Regex TokenRegex = new Regex(@"\d+|""[^""]*""|[(){}[\];+\-*\/%=<>!,]|senao|enquanto|para|foreach|se|em|escreve|lerlinha|num|txt|bol|verdadeiro|falso|[a-zA-Z_][a-zA-Z0-9_]*", RegexOptions.Compiled);
+        private static readonly Regex TokenRegex = new(@"\d+|""[^""]*""|[(){}[\];+\-*\/%=<>!,]|senao|enquanto|para|foreach|se|em|escreve|lerlinha|num|txt|bol|verdadeiro|falso|[a-zA-Z_][a-zA-Z0-9_]*", RegexOptions.Compiled);
         private readonly string _text;
         private int _pos;
 
-        public LexerToken(string text)
-        {
-            _text = text;
-        }
+        public LexerToken(string text) => _text = text;
 
         public Token GetNextToken()
         {
@@ -23,12 +20,12 @@ namespace Portugol.Builder.Lexer
             if (_pos >= _text.Length)
                 return new Token(TokenType.EOF, "");
 
-            var match = TokenRegex.Match(_text, _pos);
+            Match match = TokenRegex.Match(_text, _pos);
             if (!match.Success || match.Index != _pos)
                 throw new Exception($"Invalid character at position {_pos} [{match.Value}]");
 
             _pos += match.Length;
-            var value = match.Value;
+            string value = match.Value;
 
             return value switch
             {
@@ -65,7 +62,7 @@ namespace Portugol.Builder.Lexer
                 "<=" => new Token(TokenType.LessEqual, value),
                 ">=" => new Token(TokenType.GreaterEqual, value),
                 "=" => new Token(TokenType.Assign, value),
-                _ when value.StartsWith("\"") && value.EndsWith("\"") => new Token(TokenType.String, value.Substring(1, value.Length - 2)),
+                _ when value.StartsWith("\"") && value.EndsWith("\"") => new Token(TokenType.String, value[1..^1]),
                 _ when int.TryParse(value, out _) => new Token(TokenType.Number, value),
                 _ when char.IsLetter(value[0]) => new Token(TokenType.Identifier, value),
                 _ => throw new Exception($"Invalid character at position {_pos}"),

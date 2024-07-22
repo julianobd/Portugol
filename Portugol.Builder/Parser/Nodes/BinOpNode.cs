@@ -14,6 +14,5 @@ namespace Portugol.Builder.Parser.Nodes
             Op = op;
             Right = right;
         }
-
     }
 }

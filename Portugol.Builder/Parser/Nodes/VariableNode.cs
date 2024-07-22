@@ -7,9 +7,6 @@ namespace Portugol.Builder.Parser.Nodes
         public Token Token { get; }
         public string Name => Token.Value;
 
-        public VariableNode(Token token)
-        {
-            Token = token;
-        }
+        public VariableNode(Token token) => Token = token;
     }
 }

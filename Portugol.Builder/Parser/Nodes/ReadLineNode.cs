@@ -4,9 +4,6 @@
     {
         public VariableNode Variable { get; }
 
-        public ReadLineNode(VariableNode variable)
-        {
-            Variable = variable;
-        }
+        public ReadLineNode(VariableNode variable) => Variable = variable;
     }
 }

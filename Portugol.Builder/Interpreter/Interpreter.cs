@@ -6,14 +6,11 @@ namespace Portugol.Builder.Interpreter
     public class Interpreter
     {
         private readonly Node _tree;
-        private readonly Dictionary<string, object> _variables = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> _variables = [];
 
-        public Interpreter(Node tree)
-        {
-            _tree = tree;
-        }
+        public Interpreter(Node tree) => _tree = tree;
 
-        private object Visit(Node node)
+        private object? Visit(Node node)
         {
             switch (node)
             {
@@ -28,24 +25,21 @@ namespace Portugol.Builder.Interpreter
                         return _variables[v.Name];
                     throw new Exception($"Variável não definida: {v.Name}");
                 case AssignNode a:
-                    var value = Visit(a.Value);
+                    object value = Visit(a.Value);
                     _variables[a.Variable.Name] = value;
                     return value;
                 case PrintNode p:
-                    var exprValue = Visit(p.Expression);
+                    object exprValue = Visit(p.Expression);
                     Console.WriteLine(exprValue);
                     return null;
                 case ReadLineNode r:
-                    var input = Console.ReadLine();
+                    string? input = Console.ReadLine();
                     if (_variables.ContainsKey(r.Variable.Name))
                     {
-                        var varType = _variables[r.Variable.Name].GetType();
+                        Type varType = _variables[r.Variable.Name].GetType();
                         if (varType == typeof(int))
                         {
-                            if (int.TryParse(input, out var intValue))
-                                _variables[r.Variable.Name] = intValue;
-                            else
-                                throw new Exception($"Entrada inválida: {input}");
+                            _variables[r.Variable.Name] = int.TryParse(input, out int intValue) ? (object)intValue : throw new Exception($"Entrada inválida: {input}");
                         }
                         else if (varType == typeof(string))
                         {
@@ -53,55 +47,52 @@ namespace Portugol.Builder.Interpreter
                         }
                         else if (varType == typeof(bool))
                         {
-                            if (bool.TryParse(input, out var boolValue))
-                                _variables[r.Variable.Name] = boolValue;
-                            else
-                                throw new Exception($"Entrada inválida: {input}");
+                            _variables[r.Variable.Name] = bool.TryParse(input, out bool boolValue) ? (object)boolValue : throw new Exception($"Entrada inválida: {input}");
                         }
                     }
                     return null;
                 case BlockNode b:
-                    foreach (var statement in b.Statements)
+                    foreach (Node statement in b.Statements)
                     {
-                        Visit(statement);
+                        _ = Visit(statement);
                     }
                     return null;
                 case IfNode i:
-                    var conditionValue = (bool)Visit(i.Condition);
+                    bool conditionValue = (bool)Visit(i.Condition);
                     if (conditionValue)
                     {
-                        Visit(i.ThenBranch);
+                        _ = Visit(i.ThenBranch);
                     }
                     else if (i.ElseBranch != null)
                     {
-                        Visit(i.ElseBranch);
+                        _ = Visit(i.ElseBranch);
                     }
                     return null;
                 case WhileNode w:
                     while ((bool)Visit(w.Condition))
                     {
-                        Visit(w.Body);
+                        _ = Visit(w.Body);
                     }
                     return null;
                 case ForNode f:
                     for (Visit(f.Initializer); (bool)Visit(f.Condition); Visit(f.Iterator))
                     {
-                        Visit(f.Body);
+                        _ = Visit(f.Body);
                     }
                     return null;
                 case ForeachNode e:
-                    var collection = Visit(e.Collection) as List<object>;
-                    var index = 0;
-                    foreach (var item in collection)
+                    List<object>? collection = Visit(e.Collection) as List<object>;
+                    int index = 0;
+                    foreach (object item in collection)
                     {
                         _variables[e.Variable.Name] = item;
-                        Visit(e.Body);
+                        _ = Visit(e.Body);
                         index++;
                     }
                     return null;
                 case ArrayNode a:
-                    var elements = new List<object>();
-                    foreach (var element in a.Elements)
+                    List<object> elements = [];
+                    foreach (Node element in a.Elements)
                     {
                         elements.Add(Visit(element));
                     }
@@ -113,12 +104,12 @@ namespace Portugol.Builder.Interpreter
                         TokenType.Minus => (int)Visit(b.Left) - (int)Visit(b.Right),
                         TokenType.Multiply => (int)Visit(b.Left) * (int)Visit(b.Right),
                         TokenType.Divide => (int)Visit(b.Left) / (int)Visit(b.Right),
-                        TokenType.Equal => Visit(b.Left) == Visit(b.Right) ? true : false,
-                        TokenType.NotEqual => Visit(b.Left) != Visit(b.Right) ? true : false,
-                        TokenType.LessThan => (int)Visit(b.Left) < (int)Visit(b.Right) ? true : false,
-                        TokenType.GreaterThan => (int)Visit(b.Left) > (int)Visit(b.Right) ? true : false,
-                        TokenType.LessEqual => (int)Visit(b.Left) <= (int)Visit(b.Right) ? true : false,
-                        TokenType.GreaterEqual => (int)Visit(b.Left) >= (int)Visit(b.Right) ? true : false,
+                        TokenType.Equal => Visit(b.Left) == Visit(b.Right),
+                        TokenType.NotEqual => Visit(b.Left) != Visit(b.Right),
+                        TokenType.LessThan => (int)Visit(b.Left) < (int)Visit(b.Right),
+                        TokenType.GreaterThan => (int)Visit(b.Left) > (int)Visit(b.Right),
+                        TokenType.LessEqual => (int)Visit(b.Left) <= (int)Visit(b.Right),
+                        TokenType.GreaterEqual => (int)Visit(b.Left) >= (int)Visit(b.Right),
                         _ => throw new Exception($"Invalid operator {b.Op}")
                     };
                 default:
@@ -126,10 +117,6 @@ namespace Portugol.Builder.Interpreter
             }
         }
 
-        public void Interpret()
-        {
-            Visit(_tree);
-        }
+        public void Interpret() => Visit(_tree);
     }
-
 }
