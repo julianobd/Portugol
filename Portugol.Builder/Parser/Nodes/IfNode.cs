@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Portugol.Builder.Parser.Nodes
+﻿namespace Portugol.Builder.Parser.Nodes
 {
     public class IfNode : Node
     {

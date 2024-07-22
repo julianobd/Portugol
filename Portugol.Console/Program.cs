@@ -4,7 +4,6 @@
 using Portugol.Builder.Interpreter;
 using Portugol.Builder.Lexer;
 using Portugol.Builder.Parser;
-using System.Diagnostics.Metrics;
 
 var program = @"
 num i = 2;
