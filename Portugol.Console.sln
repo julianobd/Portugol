@@ -7,11 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portugol.Console", "Portugo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portugol.Builder", "Portugol.Builder\Portugol.Builder.csproj", "{86A3E896-5660-4354-83D0-A63658661ED0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens de Solução", "Itens de Solução", "{8E7B62F1-C0E5-4EC8-93F4-DFC713F9ED8F}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\..\Downloads\.editorconfig = ..\..\..\Downloads\.editorconfig
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

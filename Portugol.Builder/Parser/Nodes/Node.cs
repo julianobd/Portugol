@@ -1,4 +1,7 @@
-﻿namespace Portugol.Builder.Parser.Nodes
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+namespace Portugol.Builder.Parser.Nodes
 {
-    public abstract class Node { }
+	public abstract class Node { }
 }
